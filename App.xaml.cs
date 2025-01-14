@@ -1,7 +1,25 @@
-﻿namespace GalGabrielLab7
+﻿using GalGabrielLab7.Data;
+
+namespace GalGabrielLab7
 {
     public partial class App : Application
     {
+
+        static ShoppingListDatabase database;
+        public static ShoppingListDatabase Database
+        {
+            get
+            {
+                if (database == null)
+                {
+                    database = new
+                   ShoppingListDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.
+                   LocalApplicationData), "ShoppingList.db3"));
+                }
+                return database;
+            }
+        }
+
         public App()
         {
             InitializeComponent();
