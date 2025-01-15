@@ -1,30 +1,37 @@
-﻿using GalGabrielLab7.Data;
-
-namespace GalGabrielLab7
+﻿using SQLite;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GalGabrielLab7.Models;
+namespace GalGabrielLab7.Data
 {
-    public partial class App : Application
+    public class ShopListDatabase
     {
-
-        static ShoppingListDatabase database;
-        public static ShoppingListDatabase Database
+        readonly SQLiteAsyncConnection _database;
+        public ShopListDatabase(string dbPath)
         {
-            get
+            _database = new SQLiteAsyncConnection(dbPath);
+            _database.CreateTableAsync<ShopList>().Wait();
+            _database.CreateTableAsync<Product>().Wait();
+            _database.CreateTableAsync<ListProduct>().Wait();
+        }
+        public Task<int> SaveProductAsync(Product product)
+        {
+            if (product.ID != 0)
             {
-                if (database == null)
-                {
-                    database = new
-                   ShoppingListDatabase(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.
-                   LocalApplicationData), "ShoppingList.db3"));
-                }
-                return database;
+                return _database.UpdateAsync(product);
+            }
+            else
+            {
+                return _database.InsertAsync(product);
             }
         }
-
-        public App()
+        public Task<int> DeleteProductAsync(Product product)
         {
-            InitializeComponent();
-
-            MainPage = new AppShell();
+            return _database.DeleteAsync(product);
+        }
+        public Task<List<Product>> GetProductsAsync()
+        {
+            return _database.Table<Product>().ToListAsync();
         }
     }
 }
